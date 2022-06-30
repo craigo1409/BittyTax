@@ -32,6 +32,7 @@ if sys.stdout.encoding != 'UTF-8':
     else:
         sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
 
+
 def main():
     colorama.init()
     parser = argparse.ArgumentParser()
@@ -98,7 +99,7 @@ def main():
         transaction_records = do_import(args.filename)
     except IOError:
         parser.exit("%sERROR%s File could not be read: %s" % (
-            Back.RED+Fore.BLACK, Back.RESET+Fore.RED, args.filename))
+            Back.RED + Fore.BLACK, Back.RESET + Fore.RED, args.filename))
     except ImportFailureError:
         parser.exit()
 
@@ -125,7 +126,7 @@ def main():
 
     except DataSourceError as e:
         parser.exit("%sERROR%s %s" % (
-            Back.RED+Fore.BLACK, Back.RESET+Fore.RED, e))
+            Back.RED + Fore.BLACK, Back.RESET + Fore.RED, e))
 
     if args.nopdf:
         ReportLog(audit,
@@ -141,16 +142,18 @@ def main():
                   tax.holdings_report,
                   args)
 
+
 def validate_year(value):
     year = int(value)
     if year not in CCG.CG_DATA_INDIVIDUAL:
         raise argparse.ArgumentTypeError("tax year %d is not supported, "
                                          "must be in the range (%s-%s)" % (
-            year,
-            min(CCG.CG_DATA_INDIVIDUAL),
-            max(CCG.CG_DATA_INDIVIDUAL)))
+                                             year,
+                                             min(CCG.CG_DATA_INDIVIDUAL),
+                                             max(CCG.CG_DATA_INDIVIDUAL)))
 
     return year
+
 
 def do_import(filename):
     import_records = ImportRecords()
@@ -176,6 +179,7 @@ def do_import(filename):
 
     return import_records.get_records()
 
+
 def do_tax(transaction_records, tax_rules, skip_integrity_check):
     value_asset = ValueAsset()
     transaction_history = TransactionHistory(transaction_records, value_asset)
@@ -191,6 +195,7 @@ def do_tax(transaction_records, tax_rules, skip_integrity_check):
 
     tax.process_section104(skip_integrity_check)
     return tax, value_asset
+
 
 def do_integrity_check(audit, holdings):
     int_passed = True
@@ -211,20 +216,22 @@ def do_integrity_check(audit, holdings):
     if transfer_mismatch:
         print("%sWARNING%s Integrity check failed: disposal(s) detected during transfer, "
               "turn on logging [-d] to see transactions" % (
-                  Back.YELLOW+Fore.BLACK, Back.RESET+Fore.YELLOW))
+                  Back.YELLOW + Fore.BLACK, Back.RESET + Fore.YELLOW))
     elif not pools_match:
         if not config.transfers_include:
             print("%sWARNING%s Integrity check failed: audit does not match section 104 pools, "
                   "please check Withdrawals and Deposits for missing fees" % (
-                      Back.YELLOW+Fore.BLACK, Back.RESET+Fore.YELLOW))
+                      Back.YELLOW + Fore.BLACK, Back.RESET + Fore.YELLOW))
         else:
             print("%sERROR%s Integrity check failed: audit does not match section 104 pools" % (
-                Back.RED+Fore.BLACK, Back.RESET+Fore.RED))
+                Back.RED + Fore.BLACK, Back.RESET + Fore.RED))
         audit.report_failures()
     return int_passed
 
+
 def transfer_mismatches(holdings):
     return bool([asset for asset in holdings if holdings[asset].mismatches])
+
 
 def do_each_tax_year(tax, tax_year, summary, value_asset):
     if tax_year:
@@ -248,14 +255,19 @@ def do_each_tax_year(tax, tax_year, summary, value_asset):
                     tax.calculate_income(year)
             else:
                 print("%sWARNING%s Tax year %s is not supported" % (
-                    Back.YELLOW+Fore.BLACK, Back.RESET+Fore.YELLOW, year))
+                    Back.YELLOW + Fore.BLACK, Back.RESET + Fore.YELLOW, year))
 
         if not summary:
             tax.calculate_holdings(value_asset)
 
     return tax, value_asset
 
+
 def do_export(transaction_records):
     value_asset = ValueAsset()
     TransactionHistory(transaction_records, value_asset)
     ExportRecords(transaction_records).write_csv()
+
+
+if __name__ == "__main__":
+    main()

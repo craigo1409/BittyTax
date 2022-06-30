@@ -20,7 +20,7 @@ from .datamerge import DataMerge
 from .output_csv import OutputCsv
 from .output_excel import OutputExcel
 from .exceptions import UnknownCryptoassetError, UnknownUsernameError, DataFilenameError, \
-                        DataFormatUnrecognised
+    DataFormatUnrecognised
 
 if sys.stderr.encoding != 'UTF-8':
     if sys.version_info[:2] >= (3, 7):
@@ -30,10 +30,11 @@ if sys.stderr.encoding != 'UTF-8':
     else:
         sys.stderr = codecs.getwriter('utf-8')(sys.stderr)
 
+
 def main():
     colorama.init()
     parser = argparse.ArgumentParser(epilog="supported data file formats:\n" +
-                                     DataParser.format_parsers(),
+                                            DataParser.format_parsers(),
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('filename',
                         type=str,
@@ -111,17 +112,17 @@ def main():
                 parser.exit("%s: error: %s" % (parser.prog, e))
             except DataFormatUnrecognised as e:
                 sys.stderr.write("%sWARNING%s %s\n" % (
-                    Back.YELLOW+Fore.BLACK, Back.RESET+Fore.YELLOW, e))
+                    Back.YELLOW + Fore.BLACK, Back.RESET + Fore.YELLOW, e))
             except IOError as e:
                 if e.errno == errno.ENOENT:
                     sys.stderr.write("%sWARNING%s File does not exist: %s\n" % (
-                        Back.YELLOW+Fore.BLACK, Back.RESET+Fore.YELLOW, pathname))
+                        Back.YELLOW + Fore.BLACK, Back.RESET + Fore.YELLOW, pathname))
                 elif e.errno == errno.EISDIR:
                     sys.stderr.write("%sWARNING%s File is a directory: %s\n" % (
-                        Back.YELLOW+Fore.BLACK, Back.RESET+Fore.YELLOW, pathname))
+                        Back.YELLOW + Fore.BLACK, Back.RESET + Fore.YELLOW, pathname))
                 else:
                     sys.stderr.write("%sWARNING%s File could not be read: %s\n" % (
-                        Back.YELLOW+Fore.BLACK, Back.RESET+Fore.YELLOW, pathname))
+                        Back.YELLOW + Fore.BLACK, Back.RESET + Fore.YELLOW, pathname))
 
     if DataFile.data_files:
         DataMerge.match_merge(DataFile.data_files)
@@ -135,6 +136,7 @@ def main():
             sys.stderr.flush()
             output.write_csv()
 
+
 def do_read_file(pathname, args):
     try:
         for worksheet, datemode in DataFile.read_excel(pathname):
@@ -142,6 +144,10 @@ def do_read_file(pathname, args):
                 DataFile.read_worksheet(worksheet, datemode, pathname, args)
             except DataFormatUnrecognised as e:
                 sys.stderr.write("%sWARNING%s %s\n" % (
-                    Back.YELLOW+Fore.BLACK, Back.RESET+Fore.YELLOW, e))
+                    Back.YELLOW + Fore.BLACK, Back.RESET + Fore.YELLOW, e))
     except xlrd.XLRDError:
         DataFile.read_csv(pathname, args)
+
+
+if __name__ == "__main__":
+    main()

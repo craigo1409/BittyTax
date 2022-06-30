@@ -40,6 +40,7 @@ from . import kraken
 from . import kucoin
 from . import ledgerlive
 from . import liquid
+from . import livecoinwatch
 from . import mercatox
 from . import nault
 from . import nexo
